@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест на креативность</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --ink: #1a1208;
+    --paper: #faf7f0;
+    --cream: #f0ead8;
+    --amber: #c8761a;
+    --amber-light: #e8a94a;
+    --rust: #9c3f1e;
+    --sage: #4a6741;
+    --muted: #7a6f5e;
+    --border: #d4c9b0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Decorative background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(200,118,26,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(156,63,30,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .header {
+    padding: 48px 0 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+  }
+
+  .header-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .header-desc {
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Start screen */
+  #start-screen {
+    padding: 48px 0;
+  }
+
+  .instructions {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+
+  .instructions h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ink);
+  }
+
+  .instructions p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  .instructions p:last-child { margin-bottom: 0; }
+
+  .scales-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .scale-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scale-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+  }
+
+  .scale-card:nth-child(1)::before { background: var(--amber); }
+  .scale-card:nth-child(2)::before { background: var(--rust); }
+  .scale-card:nth-child(3)::before { background: var(--sage); }
+  .scale-card:nth-child(4)::before { background: #5a6fa8; }
+
+  .scale-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .scale-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .start-btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .start-btn:hover { background: var(--amber); transform: translateY(-1px); }
+  .start-btn:active { transform: translateY(0); }
+
+  /* Quiz screen */
+  #quiz-screen { display: none; padding: 32px 0 64px; }
+
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--amber), var(--rust));
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  .question-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .q-counter {
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .q-category {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    font-weight: 500;
+    padding: 4px 10px;
+    border: 1px solid var(--amber-light);
+    border-radius: 99px;
+  }
+
+  .question-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 40px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .question-number-bg {
+    font-family: 'Playfair Display', serif;
+    font-size: 80px;
+    font-weight: 900;
+    color: var(--cream);
+    position: absolute;
+    top: 16px; right: 24px;
+    line-height: 1;
+    user-select: none;
+    transition: color 0.3s;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 3vw, 24px);
+    font-weight: 700;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+    max-width: 90%;
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .answer-btn {
+    padding: 16px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .answer-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--amber);
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    z-index: 0;
+  }
+
+  .answer-btn span { position: relative; z-index: 1; }
+
+  .answer-btn:hover {
+    border-color: var(--amber);
+    color: white;
+  }
+
+  .answer-btn:hover::before { transform: translateX(0); }
+
+  .answer-btn.selected {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+
+  .answer-btn.selected::before { transform: translateX(0); background: var(--ink); }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+  }
+
+  .nav-btn {
+    padding: 12px 28px;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-btn.back {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .nav-btn.back:hover { border-color: var(--ink); color: var(--ink); }
+
+  .nav-btn.next {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: white;
+  }
+
+  .nav-btn.next:hover { background: var(--amber); border-color: var(--amber); }
+  .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+  /* Results screen */
+  #results-screen { display: none; padding: 32px 0 64px; }
+
+  .results-header {
+    text-align: center;
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .results-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .results-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .score-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .score-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-card-accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+  }
+
+  .score-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .score-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .score-bar-wrap {
+    height: 6px;
+    background: var(--cream);
+    border-radius: 99px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .score-bar {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    width: 0;
+  }
+
+  .score-value {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .score-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-level {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 99px;
+    display: inline-block;
+    margin-top: 8px;
+  }
+
+  .level-high { background: #e8f5e9; color: #2e7d32; }
+  .level-mid  { background: #fff8e1; color: #f57f17; }
+  .level-low  { background: #fce4ec; color: #c62828; }
+
+  .total-card {
+    background: var(--ink);
+    color: white;
+    border-radius: 2px;
+    padding: 36px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .total-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 80px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--amber-light);
+    flex-shrink: 0;
+  }
+
+  .total-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .total-text p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+  }
+
+  .description-block {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .description-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .description-block p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .restart-btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .restart-btn:hover { background: var(--ink); color: var(--paper); }
+
+  /* Transitions */
+  .fade-in { animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 560px) {
+    .scales-grid { grid-template-columns: 1fr; }
+    .answers-grid { grid-template-columns: 1fr; }
+    .score-row { grid-template-columns: 1fr; }
+    .question-card { padding: 28px 24px; }
+    .question-number-bg { font-size: 56px; }
+    .total-card { flex-direction: column; gap: 16px; text-align: center; }
+    .total-number { font-size: 56px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-label">Методика Е. Е. Туник</div>
+    <h1>Диагностика личностной<br>креативности</h1>
+    <p class="header-desc">56 утверждений, четыре шкалы творческой личности. Отвечайте честно и быстро — первый импульс точнее всего.</p>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="start-screen">
+    <div class="instructions" style="margin-top:40px;">
+      <h2>Инструкция</h2>
+      <p>Среди следующих коротких предложений вы найдёте такие, которые определённо подходят вам лучше, чем другие. Выберите «Да». Некоторые предложения подходят лишь частично — «Может быть». Другие не подойдут совсем — «Нет». Если не можете прийти к решению — «Не знаю».</p>
+      <p>Нет правильных или неправильных ответов. Отмечайте первое, что приходит в голову. На каждый вопрос — только один ответ.</p>
+    </div>
+
+    <div class="scales-grid">
+      <div class="scale-card">
+        <div class="scale-name">Любознательность</div>
+        <div class="scale-desc">Стремление узнать новое, задавать вопросы, исследовать мир вокруг</div>
+      </div>
+      <div class="scale-card">
+        <div class="scale-name">Воображение</div>
+        <div class="scale-desc">Способность придумывать, фантазировать, представлять несуществующее</div>
+      </div>
+      <div class="scale-card">
+        <div class="scale-name">Сложность</div>
+        <div class="scale-desc">Тяга к неоднозначным задачам, умение принимать многозначность мира</div>
+      </div>
+      <div class="scale-card">
+        <div class="scale-name">Склонность к риску</div>
+        <div class="scale-desc">Готовность пробовать новое, отстаивать свои идеи вопреки неудаче</div>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz()">Начать тест →</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quiz-screen">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="question-meta">
+      <span class="q-counter" id="q-counter">Вопрос 1 из 56</span>
+      <span class="q-category" id="q-category"></span>
+    </div>
+    <div class="question-card fade-in" id="question-card">
+      <div class="question-number-bg" id="q-num-bg"></div>
+      <div class="question-text" id="q-text"></div>
+    </div>
+    <div class="answers-grid" id="answers-grid"></div>
+    <div class="nav-row">
+      <button class="nav-btn back" id="btn-back" onclick="prevQuestion()">← Назад</button>
+      <button class="nav-btn next" id="btn-next" onclick="nextQuestion()">Далее →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="results-screen">
+    <div class="results-header">
+      <div class="header-label" style="margin-bottom:12px;">Ваш результат</div>
+      <h2>Профиль креативности</h2>
+      <p class="results-subtitle">На основе методики Е. Е. Туник</p>
+    </div>
+
+    <div class="total-card" id="total-card">
+      <div class="total-number" id="total-score">—</div>
+      <div class="total-text">
+        <h3 id="total-level-name">—</h3>
+        <p id="total-desc">—</p>
+      </div>
+    </div>
+
+    <div class="score-row" id="score-row"></div>
+    <div class="description-block" id="desc-block"></div>
+
+    <button class="restart-btn" onclick="restart()">Пройти тест заново</button>
+  </div>
+
+</div><!-- /wrapper -->
+
+<script>
+// ===== QUESTIONS =====
+// scale: L=любознательность, V=воображение, S=сложность, R=риск
+// reverse: true means "Yes" gives 0 points (reversed item)
+const questions = [
+  { n:1,  text:"Интересно браться за головоломки и игры, в которых необходимо рассчитывать свои дальнейшие ходы.", scale:"L" },
+  { n:2,  text:"Я люблю браться за новое, чтобы посмотреть, что из этого выйдет.", scale:"L" },
+  { n:3,  text:"Мне нравится решать даже такую задачу, которая не имеет правильного ответа.", scale:"S" },
+  { n:4,  text:"Мне нравится размышлять о чём-то интересном, о том, что ещё никому не приходило в голову.", scale:"V" },
+  { n:5,  text:"Если я однажды нашёл ответ на вопрос, я буду придерживаться его, а не искать другие ответы.", scale:"S", reverse:true },
+  { n:6,  text:"Я люблю представлять себе, как жили люди 200 лет назад.", scale:"V" },
+  { n:7,  text:"Когда я не знаю правильного ответа, я стараюсь догадаться о нём.", scale:"R" },
+  { n:8,  text:"Существует много вещей, с которыми мне хотелось бы поэкспериментировать.", scale:"L" },
+  { n:9,  text:"Часто мне нравится разглядывать какой-то предмет внимательно и подробно, чтобы обнаружить детали, которых не видел раньше.", scale:"L" },
+  { n:10, text:"Мне НЕ нравится, когда мои друзья менее решительны, чем я.", scale:"R", reverse:true },
+  { n:11, text:"Моим лучшим друзьям не нравятся глупые идеи.", scale:"S", reverse:true },
+  { n:12, text:"Я считаю, что у меня каждая вещь должна быть на своём месте.", scale:"S", reverse:true },
+  { n:13, text:"Я часто доверяю своей интуиции, поступаю именно так, как чувствую.", scale:"R" },
+  { n:14, text:"Я предпочитаю действовать по заранее заданному алгоритму, чем искать новые, пусть и более эффективные, способы решения.", scale:"S", reverse:true },
+  { n:15, text:"Я очень люблю проверять на практике всё, что мне показалось интересным.", scale:"L" },
+  { n:16, text:"Наверное, мне больше понравилось бы жить и работать на космической станции, чем на Земле.", scale:"V" },
+  { n:17, text:"Мне нравится заниматься чем-то новым.", scale:"R" },
+  { n:18, text:"Я обычно сохраняю спокойствие, когда делаю что-то не так или ошибаюсь.", scale:"R" },
+  { n:19, text:"Мне нравится спрашивать людей о таких вещах, о которых они не задумываются.", scale:"L" },
+  { n:20, text:"Мне трудно и некомфортно выступать на публике.", scale:"R", reverse:true },
+  { n:21, text:"Когда я читаю или смотрю телевизор, я представляю себя кем-либо из героев.", scale:"V" },
+  { n:22, text:"Мой уникальный характер очень сложен для окружающих.", scale:"S" },
+  { n:23, text:"Я часто пытаюсь представить, о чём думают другие люди.", scale:"V" },
+  { n:24, text:"Меня искренне любят все окружающие люди.", scale:"R", reverse:true },
+  { n:25, text:"Ни разу в жизни я не откладывал на завтра то, что нужно было сделать сегодня.", scale:"R", reverse:true },
+  { n:26, text:"Часто многие существующие общественные нормы и правила меня не устраивают.", scale:"S" },
+  { n:27, text:"На работе и дома у меня много интересных занятий.", scale:"L" },
+  { n:28, text:"Интересно предположить что-либо и проверить, прав ли я.", scale:"L" },
+  { n:29, text:"Мне нравится обсуждать свои идеи в компании коллег.", scale:"R" },
+  { n:30, text:"Я люблю выдумывать что-то новое, даже если это невозможно применить на практике.", scale:"V" },
+  { n:31, text:"Мне нравятся рассказы или телевизионные передачи о событиях, случившихся в прошлом.", scale:"L" },
+  { n:32, text:"Я люблю что-то необычное в своих занятиях. Это вызывает во мне неподдельный интерес.", scale:"S" },
+  { n:33, text:"Я не стесняюсь задавать вопросы, если что-то не понял или чего-то не знаю.", scale:"L" },
+  { n:34, text:"Мне нравится просто пролистывать книги и журналы, чтобы познакомиться вскользь.", scale:"L" },
+  { n:35, text:"Если мне что-то не удаётся с первого раза, я часто не могу остановиться, пока не смогу добиться своего.", scale:"R" },
+  { n:36, text:"Обычно я не трачу время на мечты о том, что когда-нибудь стану известным артистом, музыкантом, поэтом.", scale:"V", reverse:true },
+  { n:37, text:"Мне было бы интересно искать ответы на вопросы, которые возникнут в будущем.", scale:"L" },
+  { n:38, text:"Мне НЕ очень нравится планировать дела заранее, загадывать на будущее.", scale:"S", reverse:true },
+  { n:39, text:"Когда я вырасту, мне хотелось бы сделать или совершить что-то такое, что никому не удавалось до меня.", scale:"V" },
+  { n:40, text:"Я выбираю друзей, которые всегда делают все привычным способом.", scale:"S", reverse:true },
+  { n:41, text:"Я стараюсь не выбирать игры, в которые другие участники раньше не играли.", scale:"R", reverse:true },
+  { n:42, text:"Я могу выполнить любую задачу, которую мне поручают, даже если она невозможна.", scale:"R" },
+  { n:43, text:"Когда я собираюсь играть в какую-то игру, я стараюсь убедиться, что смогу выиграть.", scale:"R", reverse:true },
+  { n:44, text:"Я нервничаю, если не знаю, что произойдёт дальше.", scale:"R", reverse:true },
+  { n:45, text:"Мне нравится думать о том, чего со мной никогда не случалось.", scale:"V" },
+  { n:46, text:"Я часто мысленно проигрываю своё поведение: представляю то, что мне нужно будет узнать или сделать.", scale:"V" },
+  { n:47, text:"Мне интереснее играть в любимые игры просто ради удовольствия, а не ради выигрыша.", scale:"S" },
+  { n:48, text:"Мне всегда скучно, когда люди веселятся.", scale:"S", reverse:true },
+  { n:49, text:"Я часто завожу новых друзей, это не составляет для меня труда.", scale:"R" },
+  { n:50, text:"Я считаю, что на многие вопросы существует лишь один по-настоящему правильный ответ.", scale:"S", reverse:true },
+  { n:51, text:"Все мои неудачи связаны именно с неумением ладить с людьми.", scale:"R", reverse:true },
+  { n:52, text:"Мне хотелось бы, чтобы мои родители и руководители делали всё, как обычно, и не менялись.", scale:"S", reverse:true },
+  { n:53, text:"Меня интересуют механизмы, любопытно посмотреть, что у них внутри и как они работают.", scale:"L" },
+  { n:54, text:"Когда я вижу картину, на которой изображён кто-либо незнакомый мне, мне интересно узнать, кто это.", scale:"L" },
+  { n:55, text:"Я люблю исследовать старые чемоданы и коробки, чтобы просто посмотреть, что в них может быть.", scale:"L" },
+  { n:56, text:"Некоторые мои идеи так захватывают меня, что я забываю обо всём на свете.", scale:"V" },
+];
+
+const SCALE_NAMES = {
+  L: "Любознательность",
+  V: "Воображение",
+  S: "Сложность",
+  R: "Склонность к риску"
+};
+
+const SCALE_COLORS = {
+  L: "#c8761a",
+  V: "#9c3f1e",
+  S: "#4a6741",
+  R: "#5a6fa8"
+};
+
+// Scoring: Да=2, Может быть=1, Нет=0, Не знаю=0
+// Reversed: Да=0, Может быть=1, Нет=2, Не знаю=0
+const ANSWERS = ["Да", "Нет", "Может быть", "Не знаю"];
+const SCORE_MAP = { "Да":2, "Может быть":1, "Нет":0, "Не знаю":0 };
+const SCORE_MAP_REV = { "Да":0, "Может быть":1, "Нет":2, "Не знаю":0 };
+
+let currentQ = 0;
+let answers = new Array(56).fill(null);
+
+function startQuiz() {
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('q-counter').textContent = `Вопрос ${currentQ+1} из 56`;
+  document.getElementById('q-category').textContent = SCALE_NAMES[q.scale];
+  document.getElementById('q-num-bg').textContent = q.n;
+  document.getElementById('q-text').textContent = q.text;
+
+  // Progress
+  document.getElementById('progress-fill').style.width = ((currentQ / 56) * 100) + '%';
+
+  // Answers
+  const grid = document.getElementById('answers-grid');
+  grid.innerHTML = '';
+  ANSWERS.forEach(ans => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn' + (answers[currentQ] === ans ? ' selected' : '');
+    btn.innerHTML = `<span>${ans}</span>`;
+    btn.onclick = () => selectAnswer(ans);
+    grid.appendChild(btn);
+  });
+
+  // Nav
+  document.getElementById('btn-back').disabled = currentQ === 0;
+  document.getElementById('btn-next').textContent = currentQ === 55 ? 'Завершить →' : 'Далее →';
+
+  // Fade
+  const card = document.getElementById('question-card');
+  card.classList.remove('fade-in');
+  void card.offsetWidth;
+  card.classList.add('fade-in');
+}
+
+function selectAnswer(ans) {
+  answers[currentQ] = ans;
+  document.querySelectorAll('.answer-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.querySelector('span').textContent === ans);
+  });
+  // Auto-advance after short delay
+  setTimeout(() => {
+    if (currentQ < 55) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  }, 320);
+}
+
+function nextQuestion() {
+  if (currentQ < 55) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function calcScores() {
+  const scores = { L:0, V:0, S:0, R:0 };
+  const max    = { L:0, V:0, S:0, R:0 };
+  questions.forEach((q, i) => {
+    const ans = answers[i];
+    if (ans !== null) {
+      const map = q.reverse ? SCORE_MAP_REV : SCORE_MAP;
+      scores[q.scale] += map[ans] || 0;
+    }
+    max[q.scale] += 2; // max per question is 2
+  });
+  return { scores, max };
+}
+
+function getLevel(score, maxScore) {
+  const pct = score / maxScore;
+  if (pct >= 0.66) return { label:"Высокий", cls:"level-high" };
+  if (pct >= 0.33) return { label:"Средний", cls:"level-mid" };
+  return { label:"Низкий", cls:"level-low" };
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'block';
+
+  const { scores, max } = calcScores();
+  const total = scores.L + scores.V + scores.S + scores.R;
+  const totalMax = max.L + max.V + max.S + max.R;
+  const totalPct = total / totalMax;
+
+  // Total card
+  document.getElementById('total-score').textContent = Math.round(totalPct * 100) + '%';
+  let levelName, levelDesc;
+  if (totalPct >= 0.66) {
+    levelName = "Высокий уровень креативности";
+    levelDesc = "Вы обладаете выраженным творческим потенциалом. Вам свойственны любопытство, богатое воображение, готовность к риску и вкус к сложным задачам. Эти качества — ценный ресурс для любой сферы жизни.";
+  } else if (totalPct >= 0.33) {
+    levelName = "Средний уровень креативности";
+    levelDesc = "У вас есть хороший творческий потенциал, который проявляется в определённых областях. Развитие навыков, связанных с более слабыми шкалами, поможет раскрыть способности полнее.";
+  } else {
+    levelName = "Уровень креативности ниже среднего";
+    levelDesc = "Возможно, вы предпочитаете надёжность и предсказуемость. Помните: креативность — это навык, который развивается. Небольшие эксперименты и новые впечатления постепенно расширяют творческое мышление.";
+  }
+  document.getElementById('total-level-name').textContent = levelName;
+  document.getElementById('total-desc').textContent = levelDesc;
+
+  // Scale cards
+  const row = document.getElementById('score-row');
+  row.innerHTML = '';
+  ['L','V','S','R'].forEach(key => {
+    const s = scores[key], m = max[key];
+    const pct = (s / m * 100).toFixed(0);
+    const lv = getLevel(s, m);
+    const card = document.createElement('div');
+    card.className = 'score-card';
+    card.innerHTML = `
+      <div class="score-card-accent" style="background:${SCALE_COLORS[key]}"></div>
+      <div class="score-label">Шкала</div>
+      <div class="score-name">${SCALE_NAMES[key]}</div>
+      <div class="score-big" style="color:${SCALE_COLORS[key]}">${pct}%</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar" style="background:${SCALE_COLORS[key]}" data-pct="${pct}"></div>
+      </div>
+      <div class="score-value">${s} из ${m} баллов</div>
+      <span class="score-level ${lv.cls}">${lv.label}</span>
+    `;
+    row.appendChild(card);
+  });
+
+  // Description block
+  const descHtml = `
+    <h3>Что означают шкалы?</h3>
+    <p><strong>Любознательность</strong> — стремление исследовать, задавать вопросы, изучать окружающий мир в деталях.<br>
+    <strong>Воображение</strong> — способность придумывать и фантазировать, ставить себя на место других, мечтать о несбыточном.<br>
+    <strong>Сложность</strong> — тяга к неоднозначным задачам, принятие многозначности, отказ от единственно верного ответа.<br>
+    <strong>Склонность к риску</strong> — готовность пробовать новое, действовать при неопределённости, отстаивать свои идеи.</p>
+  `;
+  document.getElementById('desc-block').innerHTML = descHtml;
+
+  // Animate bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar').forEach(bar => {
+      bar.style.width = bar.dataset.pct + '%';
+    });
+  }, 100);
+}
+
+function restart() {
+  currentQ = 0;
+  answers = new Array(56).fill(null);
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'block';
+}
+</script>
+</body>
+</html>
